@@ -8,13 +8,14 @@
       let
         upstreams = {
           inherit (inputs.nixpkgs.legacyPackages.${system})
-            writeShellApplication coreutils-prefixed fd;
+            writeShellApplication coreutils-prefixed diffutils fd;
         };
       in {
         packages.emplacetree = upstreams.writeShellApplication {
           name = "emplacetree";
           text = builtins.readFile ./emplacetree.sh;
-          runtimeInputs = [ upstreams.fd upstreams.coreutils-prefixed ];
+          runtimeInputs =
+            [ upstreams.fd upstreams.coreutils-prefixed upstreams.diffutils ];
         };
         packages.default = inputs.self.packages.${system}.emplacetree;
       });
