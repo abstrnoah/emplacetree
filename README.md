@@ -191,7 +191,11 @@ run the script with [bash], assuming you have the dependencies in your path.
 
 # Bugs
 
+As of yet, I have been lazy about testing. So YMMV. Please feel free to report
+[issues].
+
 * The script is technically not atomic.
+* `emplacetree rm` prunes below the destination root if empty.
 
 ---
 [stow]: https://github.com/aspiers/stow
@@ -210,3 +214,4 @@ run the script with [bash], assuming you have the dependencies in your path.
 [bash]: https://www.gnu.org/software/bash/
 [realpath]: https://www.gnu.org/software/coreutils/manual/html_node/realpath-invocation.html
 [diffutils]: https://www.gnu.org/software/diffutils/diffutils.html
+[issues]: https://github.com/abstrnoah/emplacetree/issues

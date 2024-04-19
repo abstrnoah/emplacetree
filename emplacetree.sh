@@ -35,7 +35,7 @@ fi
 our_fd() {
     local src_root="$1"
     shift
-    fd --unrestricted --follow --base-directory "$src_root" "$@"
+    fd --strip-cwd-prefix --unrestricted --follow --base-directory "$src_root" "$@"
 }
 
 ls_leaves() {
@@ -171,6 +171,27 @@ cp_leaves() {
     emplace_leaves "$1" "$2" cp_leaf
 }
 
+rm_tree() {
+    if gtest "$#" -ne 2; then
+        usage_error
+    fi
+    local src_root
+    local dst_root
+    src_root="$(clean_path "$1")"
+    dst_root="$(clean_path "$2")"
+
+    safety_checks "$src_root" "$dst_root"
+
+    ls_leaves "$src_root" -x grm -f "$dst_root/{}"
+
+    for node in $(ls_dirlike "$src_root"); do
+        local dst_node="$dst_root/$node"
+        if gtest -d "$dst_node"; then
+            grmdir --ignore-fail-on-non-empty -p "$dst_node"
+        fi
+    done
+}
+
 subcommand="$1"
 shift
 
@@ -185,10 +206,13 @@ case "$subcommand" in
         cp_leaves "$@"
         ;;
     rm)
-        oops 1 TODO
+        rm_tree "$@"
         ;;
     ls)
-        ls_leaves "$@"
+        if gtest "$#" -ne 1; then
+            usage_error;
+        fi
+        ls_leaves "$1"
         ;;
     check)
         safety_checks "$@"
