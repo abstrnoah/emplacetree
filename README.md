@@ -107,8 +107,9 @@ on the mistaken root.
 
 * The _canonical path_ of a given path is obtained by following symlinks in
   every component of the path until no initial segment of the path is a symlink.
-  We use the implementation [`readlink --canonicalize`][readlink].
-* Two paths are _equivalent_ when their canonical paths are equal.
+  We use the implementation [`realpath -e`][realpath].
+* Two paths are _equivalent_ when their canonical paths are equal or they have
+  identical contents.
 * A _leaf_ is a node whose canonical path is a regular file. That is, it is a
   regular file or a symlink to one and not a directory, symlink to directory,
   nor special file.
@@ -170,13 +171,15 @@ emplacetree ls SOURCE | rargs echo SOURCE/{}
 # Installation
 
 Dependencies:
+* [bash]
 * [GNU Coreutils][coreutils]
+* [GNU Diffutils][diffutils]
 * [fd]
 
 The preferred use is as a [nix] flake. Therefore, the file `emplacetree.sh` is
 written under the assumption that you build the script using [nixpkgs
 `writeShellApplication`][nixpkgs-writeshellapp]. However, one should be able to
-run the script with [bash], assuming you have [coreutils] and [fd] in your path.
+run the script with [bash], assuming you have the dependencies in your path.
 
 # Alternatives
 
@@ -205,3 +208,5 @@ run the script with [bash], assuming you have [coreutils] and [fd] in your path.
 [coreutils]: https://www.gnu.org/software/coreutils/
 [nixpkgs-writeshellapp]: https://nixos.org/manual/nixpkgs/stable/#trivial-builder-writeShellApplication
 [bash]: https://www.gnu.org/software/bash/
+[realpath]: https://www.gnu.org/software/coreutils/manual/html_node/realpath-invocation.html
+[diffutils]: https://www.gnu.org/software/diffutils/diffutils.html
