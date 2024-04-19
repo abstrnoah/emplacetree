@@ -82,11 +82,7 @@ Do not clobber, unless the destination is equivalent to its source.
 Obviously, we want the default behaviour to avoid clobbering files. One
 possibility was to never clobber, even if the destination is semantically
 equivalent to the source. I decided instead to proceed successfully if the
-destination is equivalent, in order to make the tool idempotent. One consequence
-is that if you manually create part of the destination tree in a different way
-(say, using relative rather than absolute symlinks), then `emplacetree` will
-retain your nonstandard emplacement without complaint. If you want to normalise
-an emplacement, then `emplacetree rm` first.
+destination is equivalent, in order to make the tool idempotent.
 
 > Let the user exclude files?
 
@@ -123,15 +119,15 @@ on the mistaken root.
 * For a pair `(SOURCE/P, DESTINATION/P)`, we call the former the _source_ and
   the latter the _destination_.
 
-## Safety checks
+## Safety checks (`emplace check SOURCE DESTINATION`)
 
 All commands run the following checks before proceeding:
 * If `SOURCE` or `DESTINATION` exists but is not directory-like, then abort with
   status `4`.
-* If the destination of any directory-like source is not a directory, then abort
-  with status `3`.
-* If any destination already exists and is not equivalent to its source, then
-  abort with status `2`.
+* If the destination of any directory-like source exists but is not a directory,
+  then abort with status `3`.
+* If the destination of any leaf exists but is not equivalent to its source,
+  then abort with status `2`.
 
 ## `emplacetree ln SOURCE DESTINATION`
 
@@ -139,8 +135,8 @@ Symlink `DESTINATION` leaves to `SOURCE` leaves.
 
 * For every directory-like source `SOURCE/P` that does not already exist, create
   the directory `DESTINATION/P` as the current user.
-* For every source leaf `SOURCE/P` whose destination does not already exist,
-  create a symlink pointing from `DESTINATION/P` to `canonical_path(SOURCE)/P`.
+* For every source leaf `SOURCE/P`, create a symlink pointing from
+  `DESTINATION/P` to `SOURCE/P`.
 
 ## `emplacetree cp SOURCE DESTINATION`
 
@@ -174,16 +170,13 @@ emplacetree ls SOURCE | rargs echo SOURCE/{}
 # Installation
 
 Dependencies:
-* GNU [`test`][test]
-* GNU [`ln`][ln]
-* GNU [`cp`][cp]
-* GNU [`rmdir`][rmdir]
-* GNU [readlink]
+* [GNU Coreutils][coreutils]
 * [fd]
 
-At this time, the script is only usable as a [nix] flake, mainly to ensure we
-use the correct instance of common utilities like `ln`. If you want me to make
-it available as a standalone script, let me know I guess.
+The preferred use is as a [nix] flake. Therefore, the file `emplacetree.sh` is
+written under the assumption that you build the script using [nixpkgs
+`writeShellApplication`][nixpkgs-writeshellapp]. However, one should be able to
+run the script with [bash], assuming you have [coreutils] and [fd] in your path.
 
 # Alternatives
 
@@ -193,6 +186,9 @@ it available as a standalone script, let me know I guess.
 * [home-manager]
 * [chemzoi]
 
+# Bugs
+
+* The script is technically not atomic.
 
 ---
 [stow]: https://github.com/aspiers/stow
@@ -206,3 +202,6 @@ it available as a standalone script, let me know I guess.
 [ln]: https://www.gnu.org/software/coreutils/manual/html_node/ln-invocation.html
 [rmdir]: https://www.gnu.org/software/coreutils/manual/html_node/rmdir-invocation.html
 [test]: https://www.gnu.org/software/coreutils/manual/html_node/test-invocation.html
+[coreutils]: https://www.gnu.org/software/coreutils/
+[nixpkgs-writeshellapp]: https://nixos.org/manual/nixpkgs/stable/#trivial-builder-writeShellApplication
+[bash]: https://www.gnu.org/software/bash/
